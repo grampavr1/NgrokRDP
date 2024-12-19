@@ -23,8 +23,7 @@ jobs:
     - name: Set RDP Credentials
       run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
     - name: Start Ngrok
-      id: ngrok
-      run: .\ngrok\ngrok.exe tcp 3389 --log=stdout --log-format=json > ngrok.log &
+      run: Start-Process -FilePath .\ngrok\ngrok.exe -ArgumentList "tcp 3389 --log=stdout --log-format=json --log=ngrok.log" -NoNewWindow -PassThru
     - name: Sleep to Ensure Ngrok Starts
       run: Start-Sleep -s 10
     - name: Get Ngrok URL
