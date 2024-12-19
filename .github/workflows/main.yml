@@ -7,33 +7,20 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Download Ngrok
+    - name: Download
       run: Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
-    - name: Extract Ngrok
+    - name: Extract
       run: Expand-Archive ngrok.zip
-    - name: Authenticate Ngrok
+    - name: Auth
       run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
       env:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-    - name: Enable Remote Desktop
-      run: |
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 0
-        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
-    - name: Set RDP Credentials
-      run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
-    - name: Start Ngrok
-      run: Start-Process -FilePath .\ngrok\ngrok.exe -ArgumentList "tcp 3389 --log=stdout --log-format=json --log=ngrok.log" -NoNewWindow -PassThru
-    - name: Sleep to Ensure Ngrok Starts
-      run: Start-Sleep -s 10
-    - name: Get Ngrok URL
-      run: |
-        $ngrok_api_url = "http://127.0.0.1:4040/api/tunnels"
-        $ngrok_url = (Invoke-RestMethod -Uri $ngrok_api_url).tunnels[0].public_url
-        echo "Ngrok URL: $ngrok_url"
-        echo "##vso[task.setvariable variable=NGROK_URL]$ngrok_url"
-    - name: Display Credentials and URL
-      run: |
-        echo "Username: runneradmin"
-        echo "Password: P@ssw0rd!"
-        echo "Ngrok URL: ${{ env.NGROK_URL }}"
+    - name: Enable TS
+      run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+    - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+    - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+    - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+    - name: Create Tunnel
+      run: .\ngrok\ngrok.exe tcp 3389
+    - name: Display Username and Password
+      run: echo "Username: runneradmin" && echo "Password: P@ssw0rd!"
