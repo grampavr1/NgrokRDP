@@ -25,4 +25,6 @@ jobs:
     - name: Create Tunnel
       run: .\ngrok\ngrok.exe tcp 3389
     - name: Display Username and Password
-      run: echo "Username: runneradmin" && echo "Password: P@ssw0rd!"
+      run: |
+        echo "Username: runneradmin"
+        echo "Password: P@ssw0rd!"
