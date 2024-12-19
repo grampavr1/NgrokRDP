@@ -23,8 +23,19 @@ jobs:
     - name: Set RDP Credentials
       run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
     - name: Create Tunnel
-      run: .\ngrok\ngrok.exe tcp 3389
-    - name: Display Username and Password
+      run: Start-Process -FilePath .\ngrok\ngrok.exe -ArgumentList "tcp 3389" -NoNewWindow
+    - name: Sleep to Ensure Ngrok Starts
+      run: Start-Sleep -s 10
+    - name: Get Ngrok Endpoint URL
+      env:
+        NGROK_API_KEY: ${{ secrets.NGROK_API_KEY }}
       run: |
+        $headers = @{
+          "Authorization" = "Bearer $Env:NGROK_API_KEY"
+          "Ngrok-Version" = "2"
+        }
+        $response = Invoke-RestMethod -Uri "https://api.ngrok.com/endpoints" -Headers $headers -Method Get
+        $ngrok_url = $response.endpoints[0].public_url
+        echo "Ngrok URL: $ngrok_url"
         echo "Username: runneradmin"
         echo "Password: P@ssw0rd!"
