@@ -24,8 +24,6 @@ jobs:
       run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
     - name: Create Tunnel
       run: Start-Process -FilePath .\ngrok\ngrok.exe -ArgumentList "tcp 3389" -NoNewWindow
-    - name: Sleep to Ensure Ngrok Starts
-      run: Start-Sleep -s 10
     - name: Get Ngrok Endpoint URL
       env:
         NGROK_API_KEY: ${{ secrets.NGROK_API_KEY }}
@@ -39,3 +37,5 @@ jobs:
         echo "Ngrok URL: $ngrok_url"
         echo "Username: runneradmin"
         echo "Password: P@ssw0rd!"
+    - name: Keep Ngrok Running
+      run: .\ngrok\ngrok.exe tcp 3389
