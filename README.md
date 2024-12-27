@@ -14,8 +14,8 @@ This repository provides a step-by-step guide to create a free Windows Server VP
 - **Easy RDP Access**: Connect to your server via Windows Remote Desktop.
 
 ## Requirements
-- A GitHub account
-- Ngrok account (Free tier works)
+- A minimum 6 month GitHub account
+- Ngrok account (Free tier works) need verified CC
 - Basic knowledge of GitHub and RDP
 
 ## Setup Instructions
